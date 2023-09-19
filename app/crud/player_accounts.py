@@ -17,7 +17,6 @@ def get_player_by_nickname(db: Session, player_nickname: str):
 
 def create_player_account(db: Session, player_create: PlayerAccountCreate):
     hashed_password = bcrypt.hashpw(player_create.password.encode("utf-8"), bcrypt.gensalt())
-    print(hashed_password)
     db_player_account = PlayerAccounts(name=player_create.name, nickname=player_create.nickname, password=hashed_password)
     db.add(db_player_account)
     db.commit()
