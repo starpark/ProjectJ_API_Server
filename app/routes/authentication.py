@@ -48,7 +48,7 @@ def login(player_account: PlayerAccountLogin, db: Session = Depends(get_db)):
         "token": token
     }
 
-@router.post("/create", status_code=status.HTTP_204_NO_CONTENT)
+@router.post("/create", status_code=status.HTTP_201_CREATED)
 async def create_player(player_create: PlayerAccountCreate, db: Session = Depends(get_db)):
     #check existing player
     player = crud.get_existing_player(db=db, player_create=player_create)
