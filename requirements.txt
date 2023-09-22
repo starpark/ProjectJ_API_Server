@@ -1,0 +1,8 @@
+###### Requirements without Version Specifiers ######
+python-jose[cryptography]
+
+###### Requirements with Version Specifiers ######
+uvicorn==0.23.2
+SQLAlchemy==2.0.21
+bcrypt==4.0.1
+pyodbc==4.0.39
