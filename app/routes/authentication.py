@@ -18,9 +18,9 @@ router = APIRouter()
 
 SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7
+ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
-@router.post("/login", response_model=PlayerAccountWithToken)
+@router.post("/login", response_model=PlayerAccountWithToken, status_code=status.HTTP_200_OK)
 def login(player_account: PlayerAccountLogin, db: Session = Depends(get_db)):
     #check player account in db
     player = crud.get_player_by_name(db=db, player_name=player_account.name)
@@ -49,7 +49,7 @@ def login(player_account: PlayerAccountLogin, db: Session = Depends(get_db)):
     }
 
 @router.post("/create", status_code=status.HTTP_201_CREATED)
-async def create_player(player_create: PlayerAccountCreate, db: Session = Depends(get_db)):
+async def create_account(player_create: PlayerAccountCreate, db: Session = Depends(get_db)):
     #check existing player
     player = crud.get_existing_player(db=db, player_create=player_create)
     if player:
