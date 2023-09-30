@@ -23,40 +23,37 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60
 @router.post("/login", response_model=PlayerAccountWithToken, status_code=status.HTTP_200_OK)
 def login(player_account: PlayerAccountLogin, db: Session = Depends(get_db)):
     #check player account in db
-    player = crud.get_player_by_name(db=db, player_name=player_account.name)
-    if not player or not bcrypt.checkpw(player_account.password.encode("utf-8"), player.password):
+
+    result = crud.get_player_by_name(db=db, player_name=player_account.name)
+    if not result or not bcrypt.checkpw(player_account.password.encode("utf-8"), result.password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect name or password",
+            detail="아이디 또는 비밀번호가 정확하지 않습니다.",
             headers={"WWW-Authenticate": "Bearer"}
         )
-
     #make some token
     payload = {
-        "player_id": player.player_id,
-        "name": player.name,
-        "nickname": player.nickname,
+        "player_id": result.player_id,
+        "name": result.name,
+        "nickname": result.nickname,
         "exp": datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     }
     token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
     #return PlayerAccountWithToken
     return {
-        "player_id": player.player_id,
-        "name": player.name,
-        "nickname": player.nickname,
+        "player_id": result.player_id,
+        "name": result.name,
+        "nickname": result.nickname,
         "token": token
     }
 
 @router.post("/create", status_code=status.HTTP_201_CREATED)
 async def create_account(player_create: PlayerAccountCreate, db: Session = Depends(get_db)):
     #check existing player
-    player = crud.get_existing_player(db=db, player_create=player_create)
-    if player:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Already existing player")
+    result = crud.get_existing_player(db=db, player_create=player_create)
+    if result:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=result)
 
-    #insert player
-    try:
-        crud.create_player_account(db=db, player_create=player_create)
-    except ValueError:
-        raise HTTPException(status_code=status.HTTP_414_REQUEST_URI_TOO_LONG, detail="Parameter too long")
+    #create player account
+    crud.create_player_account(db=db, player_create=player_create)
